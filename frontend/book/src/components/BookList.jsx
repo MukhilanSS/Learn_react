@@ -10,11 +10,10 @@ const BookList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredBooks, setFilteredBooks] = useState([]);
+  const [itemsPerPage, setItemsPerPage] = useState(5); 
 
-  const booksPerPage = 5;
   const navigate = useNavigate();
 
-  // Fetch books on mount
   useEffect(() => {
     const getBooks = async () => {
       setLoading(true);
@@ -32,7 +31,7 @@ const BookList = () => {
     getBooks();
   }, []);
 
-  // Debounce function for search (delay API calls)
+
   const debounce = (func, delay) => {
     let timer;
     return (...args) => {
@@ -41,7 +40,6 @@ const BookList = () => {
     };
   };
 
-  // Search books with debounce
   const searchBooks = useCallback(
     debounce((query) => {
       if (!query) {
@@ -52,7 +50,7 @@ const BookList = () => {
         book.bookName.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredBooks(results);
-    }, 500), // 500ms delay
+    }, 500), 
     [books]
   );
 
@@ -88,26 +86,20 @@ const BookList = () => {
     navigate("/update", { state: { book } });
   };
 
-  // Pagination logic
-  const indexOfLastBook = currentPage * booksPerPage;
-  const indexOfFirstBook = indexOfLastBook - booksPerPage;
-  const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
-  const totalPages = Math.ceil(filteredBooks.length / booksPerPage);
-
-  const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
+  
+  const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
+  const currentBooks = filteredBooks.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="container mx-auto p-6">
       <h2 className="text-center text-2xl font-bold mb-4">Book List</h2>
 
-      {/* Search Input */}
-      <div className="mb-4 flex justify-center">
+      
+      <div className="mb-4 flex justify-between items-center">
+        
         <input
           type="text"
           placeholder="Search books..."
@@ -115,6 +107,23 @@ const BookList = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+
+      
+        <div className="flex items-center">
+          <label className="mr-2 font-semibold">Items per page:</label>
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1); 
+            }}
+            className="border p-2 rounded"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
+        </div>
       </div>
 
       {loading && <p className="text-center text-gray-600">Loading books...</p>}
@@ -177,7 +186,7 @@ const BookList = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-500 hover:bg-blue-600"
               }`}
-              onClick={prevPage}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
               Previous
@@ -191,7 +200,7 @@ const BookList = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-500 hover:bg-blue-600"
               }`}
-              onClick={nextPage}
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
             >
               Next
