@@ -7,7 +7,7 @@ const UpdateBook = () => {
   const navigate = useNavigate();
   const { book } = location.state || {}; // Ensure state is available
 
-  // Redirect if book data is missing
+  // Redirect if book data is missingo
   useEffect(() => {
     if (!book) {
       alert("Invalid book data. Redirecting...");
