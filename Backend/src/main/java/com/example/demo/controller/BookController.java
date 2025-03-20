@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Book;
 import com.example.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
@@ -12,11 +13,16 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
-
     @GetMapping
     public List<Book> getBooks() {
         return bookService.getAllBooks();
     }
+
+    @GetMapping("/paginated")
+    public Page<Book> getPaginatedBooks(@RequestParam int page, @RequestParam int size, @RequestParam(required = false) String search) {
+        return bookService.getPaginatedBooks(page, size, search);
+    }
+
 
     // ✅ Add New Book
     @PostMapping("/insert")

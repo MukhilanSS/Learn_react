@@ -32,15 +32,12 @@ export const loginUser = async (credentials) => {
   }
 };
 
-export const fetchBooks = async () => {
-  try {
-    const response = await axiosInstance.get("/books");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching books:", error.response?.data || error.message);
-    throw error;
-  }
+export const fetchBooks = async (page, size, search) => {
+  const response = await fetch(`http://localhost:8080/books/paginated?page=${page}&size=${size}&search=${search || ""}`);
+  if (!response.ok) throw new Error("Failed to fetch books");
+  return response.json(); // Should return `{ content: [...], totalPages: X }`
 };
+
 
 
 export const fetchBookById = async (id) => {
